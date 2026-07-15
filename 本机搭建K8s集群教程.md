@@ -2,7 +2,9 @@
 
 > 面向 CKA 备考的动手环境搭建指南。  
 > 适用环境：Windows 10/11 + WSL2（Ubuntu）+ Docker Desktop。  
-> 配套文档：[CKA学习知识点总结.md](./CKA学习知识点总结.md)
+> 配套文档：  
+> - [CKA学习知识点总结.md](./CKA学习知识点总结.md)  
+> - [Rancher与Lens管理K8s集群教程.md](./Rancher与Lens管理K8s集群教程.md)（图形化/多集群管理）
 
 ---
 
