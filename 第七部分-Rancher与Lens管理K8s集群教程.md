@@ -1,7 +1,7 @@
 # Rancher 与 Lens（FreeLens）管理 Kubernetes 集群教程
 
 > 配套文档：  
-> - [本机搭建K8s集群教程.md](./本机搭建K8s集群教程.md)  
+> - [第一部分-本机搭建K8s集群教程.md](./第一部分-本机搭建K8s集群教程.md)  
 > - [CKA学习知识点总结.md](./CKA学习知识点总结.md)  
 >  
 > 适用环境：已有可用的 Kubernetes 集群（推荐 Multipass + kubeadm 方案 C），Windows 10/11 本机安装桌面管理工具。  
