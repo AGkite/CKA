@@ -577,6 +577,70 @@ multipass version
 |------|
 | Multipass 是 Canonical 出品的轻量 VM 管理工具，一条命令创建 Ubuntu 实例 |
 | 比 VMware 手动装系统省事，底层在 Windows 上通常用 Hyper-V |
+| 三台 VM 占磁盘大，安装后请先按 **6.2.1** 把数据目录设到 D 盘，再执行 `launch` |
+
+---
+
+### 6.2.1 将 Multipass 数据目录放到 D 盘（推荐）
+
+> 默认数据在 `C:\ProgramData\Multipass`。三台 VM（各约 20G 磁盘）+ 镜像缓存很容易把 C 盘撑满。  
+> **务必在第一次 `multipass launch` 之前完成**，否则还要迁移已有实例路径。
+
+**前置：** D 盘空闲建议 ≥ **80GB**（三台 20G 磁盘 + 镜像与缓存）。
+
+**PowerShell（管理员）：**
+
+```powershell
+# 1. 停止服务
+Stop-Service Multipass -Force
+
+# 2. 创建 D 盘数据目录
+New-Item -ItemType Directory -Path "D:\Multipass" -Force
+
+# 3. 设置系统环境变量（daemon 启动时读取）
+Set-ItemProperty `
+  -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Environment" `
+  -Name MULTIPASS_STORAGE `
+  -Value "D:\Multipass"
+
+# 4. 启动服务（建议随后重启一次 Windows，确保变量生效）
+Start-Service Multipass
+# Restart-Computer -Force   # 可选：重启更稳妥
+```
+
+**验证：**
+
+```powershell
+[Environment]::GetEnvironmentVariable("MULTIPASS_STORAGE", "Machine")
+# 应输出：D:\Multipass
+
+multipass version
+multipass list
+```
+
+| 说明 |
+|------|
+| 只迁移**数据目录**（镜像、虚拟机磁盘）；程序仍在 `C:\Program Files\Multipass`，体积很小 |
+| 不要只在当前 PowerShell 里 `$env:MULTIPASS_STORAGE=...`，服务读不到 |
+| 若出现 `The client is not authenticated`，执行 `multipass authenticate`；仍失败可用管理员执行 `multipass set local.passphrase` 后再 authenticate |
+| 改路径后若认证异常，可把原目录 ACL 复制到新目录：`$acl = Get-Acl C:\ProgramData\Multipass; Set-Acl D:\Multipass $acl`，然后重启电脑 |
+
+**若 C 盘已有旧数据需要迁到 D 盘（可选）：**
+
+```powershell
+Stop-Service Multipass -Force
+Copy-Item -Path "C:\ProgramData\Multipass\*" -Destination "D:\Multipass" -Recurse -Force
+# 已有 Hyper-V 实例时，还需在 Hyper-V 管理器中把磁盘/DVD 路径改到 D:\Multipass\...
+Start-Service Multipass
+```
+
+确认 `multipass list` 正常后，再删除 C 盘旧目录（可选）：
+
+```powershell
+Remove-Item -Path "C:\ProgramData\Multipass" -Recurse -Force
+```
+
+然后继续 [6.3 创建三台虚拟机](#63-创建三台虚拟机固定-ip防重启-ip-漂移)。
 
 ---
 
